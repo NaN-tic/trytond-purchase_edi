@@ -12,21 +12,20 @@ __all__ = ['Purchase', 'PurchaseConfiguration']
 
 DEFAULT_FILES_LOCATION = '/tmp/'
 UOMS = {
-    'kg': u'KGM',
-    'u': u'PCE',
-    'l': u'LTR'
+    'kg': 'KGM',
+    'u': 'PCE',
+    'l': 'LTR'
 }
 CM_TYPES = {
-    'phone': u'TE',
-    'mobile': u'TE',
-    'fax': u'FX',
-    'email': u'EM'
+    'phone': 'TE',
+    'mobile': 'TE',
+    'fax': 'FX',
+    'email': 'EM'
 }
 DATE_FORMAT = '%Y%m%d'
 
 
-class Purchase:
-    __metaclass__ = PoolMeta
+class Purchase(metaclass=PoolMeta):
     __name__ = 'purchase.purchase'
 
     use_edi = fields.Boolean('Use EDI',
@@ -115,24 +114,24 @@ class Purchase:
 
         header = 'ORDERS_D_96A_UN_EAN008'
         lines.append(header)
-        edi_ord = u'ORD|{0}|{1}|{2}'.format(
+        edi_ord = 'ORD|{0}|{1}|{2}'.format(
             self.reference[:17],  # limit 17 chars
             self.edi_order_type,
             self.edi_message_function)
         lines.append(edi_ord)
 
-        edi_dtm = u'DTM|{}'.format(self.purchase_date.strftime(DATE_FORMAT))
+        edi_dtm = 'DTM|{}'.format(self.purchase_date.strftime(DATE_FORMAT))
         lines.append(edi_dtm)
 
         if self.edi_special_condition:
-            edi_ali = u'ALI|{}'.format(self.edi_special_condition)
+            edi_ali = 'ALI|{}'.format(self.edi_special_condition)
             lines.append(edi_ali)
 
         if self.comment:
-            edi_ftx = u'FTX|AAI||{}'.format(self.comment[:280])  # limit 280 chars
+            edi_ftx = 'FTX|AAI||{}'.format(self.comment[:280])  # limit 280 chars
             lines.append(edi_ftx)
 
-        edi_nadms = u'NADMS|{0}|{1}|{2}|{3}|{4}|{5}'.format(
+        edi_nadms = 'NADMS|{0}|{1}|{2}|{3}|{4}|{5}'.format(
                 customer.edi_operational_point,
                 customer.name[:70],  # limit 70
                 customer_invoice_address.street[:70],  # limit 70
@@ -142,10 +141,10 @@ class Purchase:
                 )
         lines.append(edi_nadms)
 
-        edi_nadmr = u'NADMR|{}'.format(supplier.edi_operational_point)
+        edi_nadmr = 'NADMR|{}'.format(supplier.edi_operational_point)
         lines.append(edi_nadmr)
 
-        edi_nadsu = u'NADSU|{0}|{1}|{2}|{3}|{4}|{5}'.format(
+        edi_nadsu = 'NADSU|{0}|{1}|{2}|{3}|{4}|{5}'.format(
                 supplier.edi_operational_point,
                 supplier.name[:70],  # limit 70
                 self.invoice_address.street[:70],  # limit 70
@@ -155,7 +154,7 @@ class Purchase:
                 )
         lines.append(edi_nadsu)
 
-        edi_nadby = u'NADBY|{0}||||{1}|{2}|{3}|{4}|{5}'.format(
+        edi_nadby = 'NADBY|{0}||||{1}|{2}|{3}|{4}|{5}'.format(
             customer.edi_operational_point,
             customer.name[:70],  # limit 70
             customer_invoice_address.street[:70],  # limit 70
@@ -166,11 +165,11 @@ class Purchase:
         lines.append(edi_nadby)
 
         if customer_invoice_address.name:
-            edi_ctaby = u'CTABY|OC|{}'.format(
+            edi_ctaby = 'CTABY|OC|{}'.format(
                 customer_invoice_address.name[:35])  # limit 35
             lines.append(edi_ctaby)
 
-        edi_naddp = u'NADDP|{0}||{1}|{2}|{3}|{4}'.format(
+        edi_naddp = 'NADDP|{0}||{1}|{2}|{3}|{4}'.format(
             customer.edi_operational_point,
             customer_delivery_address.party.name[:70],  # limit 70
             customer_delivery_address.street[:70],  # limit 70
@@ -180,7 +179,7 @@ class Purchase:
         lines.append(edi_naddp)
 
         if customer_delivery_address.name:
-            edi_ctadp = u'CTADP|OC|{}'.format(
+            edi_ctadp = 'CTADP|OC|{}'.format(
                 customer_delivery_address.name[:35])  # limit 35
             lines.append(edi_ctadp)
 
@@ -188,12 +187,12 @@ class Purchase:
         for contact_mechanism in party_cm:
             contact_mechanism_type = CM_TYPES.get(contact_mechanism.type, '')
             if contact_mechanism_type:
-                edi_comdp = u'COMDP|{0}|{1}'.format(
+                edi_comdp = 'COMDP|{0}|{1}'.format(
                         contact_mechanism_type,
                         contact_mechanism.value[:35])  # limit 35
                 lines.append(edi_comdp)
 
-        edi_nadiv = u'NADIV|{0}||{1}|{2}|{3}|{4}|{5}'.format(
+        edi_nadiv = 'NADIV|{0}||{1}|{2}|{3}|{4}|{5}'.format(
                 customer.edi_operational_point,
                 customer.name[:70],  # limit 70
                 customer_invoice_address.street[:70],  # limit 70
@@ -203,36 +202,36 @@ class Purchase:
                 )
         lines.append(edi_nadiv)
 
-        edi_cux = u'CUX|{}'.format(self.currency.code)
+        edi_cux = 'CUX|{}'.format(self.currency.code)
         lines.append(edi_cux)
 
         for index, line in enumerate(self.lines):
             product = line.product
-            edi_lin = u'LIN|{0}|EN|{1}'.format(
+            edi_lin = 'LIN|{0}|EN|{1}'.format(
                 product.code_ean13,
                 str(index + 1))
             lines.append(edi_lin)
-            edi_pialin = u'PIALIN|IN|{}'.format(product.code[:35])  # limit 35
+            edi_pialin = 'PIALIN|IN|{}'.format(product.code[:35])  # limit 35
             lines.append(edi_pialin)
-            edi_imdlin = u'IMDLIN|F|||{}'.format(product.name[:70])  # limit 70
+            edi_imdlin = 'IMDLIN|F|||{}'.format(product.name[:70])  # limit 70
             lines.append(edi_imdlin)
-            edi_qtylin = u'QTYLIN|21|{0}|{1}'.format(
+            edi_qtylin = 'QTYLIN|21|{0}|{1}'.format(
                 str(int(line.quantity) or 0),  # limit 15
                 UOMS.get(line.unit.symbol, ''))
             lines.append(edi_qtylin)
             if line.delivery_date:
-                edi_dtmlin = u'DTMLIN||||{}||'.format(
+                edi_dtmlin = 'DTMLIN||||{}||'.format(
                     line.delivery_date.strftime(DATE_FORMAT))
                 lines.append(edi_dtmlin)
             if line.note:
-                edi_ftxlin = u'FTXLIN|{}|AAI'.format(line.note[:350])  # limit 350
+                edi_ftxlin = 'FTXLIN|{}|AAI'.format(line.note[:350])  # limit 350
                 lines.append(edi_ftxlin)
-            edi_prilin = u'PRILIN|AAA|{0}|||{1}|{2}'.format(
+            edi_prilin = 'PRILIN|AAA|{0}|||{1}|{2}'.format(
                 format(line.unit_price, '.6f')[:18],  # limit 18
                 UOMS.get(line.unit.symbol, ''),
                 self.currency.code)
             lines.append(edi_prilin)
-            edi_prilin = u'PRILIN|AAB|{0}|||{1}|{2}'.format(
+            edi_prilin = 'PRILIN|AAB|{0}|||{1}|{2}'.format(
                 format(line.gross_unit_price, '.6f')[:18],  # limit 18
                 UOMS.get(line.unit.symbol, ''),
                 self.currency.code)
@@ -240,12 +239,12 @@ class Purchase:
             if line.discount:
                 discount_value = (
                     line.gross_unit_price - line.unit_price).normalize()
-                edi_alclin = u'ALCLIN|A|1|TD|{0}|{1}'.format(
+                edi_alclin = 'ALCLIN|A|1|TD|{0}|{1}'.format(
                     str(line.discount)[:8],  # limit 8
                     str(discount_value)[:18])  # limit 18
                 lines.append(edi_alclin)
 
-        edi_moares = u'MOARES|{}\r\n'.format(str(self.total_amount)[:18])  # limit 18
+        edi_moares = 'MOARES|{}\r\n'.format(str(self.total_amount)[:18])  # limit 18
         lines.append(edi_moares)
 
         return unidecode('\r\n'.join(lines))
@@ -262,8 +261,7 @@ class Purchase:
             f.write(content.encode('utf-8'))
 
 
-class PurchaseConfiguration:
-    __metaclass__ = PoolMeta
+class PurchaseConfiguration(metaclass=PoolMeta):
     __name__ = 'purchase.configuration'
 
     path_edi = fields.Char('Path EDI')
