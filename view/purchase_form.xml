@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!-- The COPYRIGHT file at the top level of this repository contains the full
+     copyright notices and license terms. -->
+<data>
+    <xpath expr="/form/field[@name='reference']" position="after">
+        <label name="use_edi"/>
+        <field name="use_edi"/>
+    </xpath>
+    <xpath expr="/form/notebook/page[@id='purchase']" position="after">
+        <page string="EDI" id="edi_page">
+            <label name="edi_order_type"/>
+            <field name="edi_order_type"/>
+            <newline/>
+            <label name="edi_message_function"/>
+            <field name="edi_message_function"/>
+            <newline/>
+            <label name="edi_special_condition"/>
+            <field name="edi_special_condition"/>
+        </page>
+    </xpath>
+</data>

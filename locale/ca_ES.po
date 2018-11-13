@@ -1,0 +1,83 @@
+#
+msgid ""
+msgstr "Content-Type: text/plain; charset=utf-8\n"
+
+msgctxt "error:purchase.purchase:"
+msgid "Missing EDI Operational Point from party \"%s\""
+msgstr "Falta el Punt Operacional EDI per el tercer \"%s\"."
+
+msgctxt "field:purchase.configuration,path_edi:"
+msgid "Path EDI"
+msgstr "Directori EDI"
+
+msgctxt "field:purchase.purchase,edi_message_function:"
+msgid "Message Function"
+msgstr "Funció del missatge"
+
+msgctxt "field:purchase.purchase,edi_order_type:"
+msgid "Document Type"
+msgstr "Tipus de document"
+
+msgctxt "field:purchase.purchase,edi_special_condition:"
+msgid "Special conditions, codified"
+msgstr "Condicions especials, codificat"
+
+msgctxt "field:purchase.purchase,use_edi:"
+msgid "Use EDI"
+msgstr "Utilitza EDI"
+
+msgctxt "help:purchase.purchase,use_edi:"
+msgid "Use EDI protocol for this purchase"
+msgstr "Utilitzar el protocol EDI per aquesta compra"
+
+msgctxt "selection:purchase.purchase,edi_message_function:"
+msgid "Cancellation"
+msgstr "Cancelació"
+
+msgctxt "selection:purchase.purchase,edi_message_function:"
+msgid "Copy"
+msgstr "Còpia"
+
+msgctxt "selection:purchase.purchase,edi_message_function:"
+msgid "Modification"
+msgstr "Modificació"
+
+msgctxt "selection:purchase.purchase,edi_message_function:"
+msgid "Original"
+msgstr "Original"
+
+msgctxt "selection:purchase.purchase,edi_message_function:"
+msgid "Replacement"
+msgstr "Reemplaçament"
+
+msgctxt "selection:purchase.purchase,edi_order_type:"
+msgid ""
+msgstr ""
+
+msgctxt "selection:purchase.purchase,edi_order_type:"
+msgid "Normal Order"
+msgstr "Comanda Normal"
+
+msgctxt "selection:purchase.purchase,edi_order_type:"
+msgid "Partial order that cancels an open order"
+msgstr "Comanda parcial que cancel·la una altra comanda"
+
+msgctxt "selection:purchase.purchase,edi_special_condition:"
+msgid ""
+msgstr ""
+
+msgctxt "selection:purchase.purchase,edi_special_condition:"
+msgid "Bill but not re-supply"
+msgstr "Facturar pero no re-proveir"
+
+msgctxt "selection:purchase.purchase,edi_special_condition:"
+msgid "Deliver the entire order"
+msgstr "Entregar la comanda sencera"
+
+msgctxt "selection:purchase.purchase,edi_special_condition:"
+msgid "Send but not invoice"
+msgstr "Enviar però no facturar"
+
+msgctxt "view:purchase.purchase:"
+msgid "EDI"
+msgstr "EDI"
