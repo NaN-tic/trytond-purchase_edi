@@ -116,7 +116,7 @@ class Purchase:
         header = 'ORDERS_D_96A_UN_EAN008'
         lines.append(header)
         edi_ord = u'ORD|{0}|{1}|{2}'.format(
-            self.reference[:17],  # limit 17 chars
+            self.reference[:17] if self.reference else '',  # limit 17 chars
             self.edi_order_type,
             self.edi_message_function)
         lines.append(edi_ord)
