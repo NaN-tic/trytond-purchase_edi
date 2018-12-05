@@ -2,12 +2,10 @@
 <!-- The COPYRIGHT file at the top level of this repository contains the full
      copyright notices and license terms. -->
 <data>
-    <xpath expr="/form/field[@name='reference']" position="after">
-        <label name="use_edi"/>
-        <field name="use_edi"/>
-    </xpath>
     <xpath expr="/form/notebook/page[@id='purchase']" position="after">
         <page string="EDI" id="edi_page">
+            <label name="use_edi"/>
+            <field name="use_edi"/>
             <label name="edi_order_type"/>
             <field name="edi_order_type"/>
             <newline/>
