@@ -3,6 +3,10 @@ msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
 msgctxt "error:purchase.purchase:"
+msgid "Missing EDI EAN Warehouse code from address ID:\"%s\""
+msgstr "Falta el código EAN  EDI del almacén para la dirección ID:\"%s\""
+
+msgctxt "error:purchase.purchase:"
 msgid "Missing EDI Operational Point from party \"%s\""
 msgstr "Falta el Punto Operacional EDI para el tercero \"%s\"."
 
@@ -49,10 +53,6 @@ msgstr "Original"
 msgctxt "selection:purchase.purchase,edi_message_function:"
 msgid "Replacement"
 msgstr "Reemplazo"
-
-msgctxt "selection:purchase.purchase,edi_order_type:"
-msgid ""
-msgstr ""
 
 msgctxt "selection:purchase.purchase,edi_order_type:"
 msgid "Normal Order"
