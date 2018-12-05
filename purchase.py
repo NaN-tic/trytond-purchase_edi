@@ -3,7 +3,6 @@
 # copyright notices and license terms.
 from trytond.model import fields
 from trytond.pool import PoolMeta, Pool
-from trytond.pyson import Eval, Bool
 import os
 from unidecode import unidecode
 
@@ -53,7 +52,9 @@ class Purchase(metaclass=PoolMeta):
         super(Purchase, cls).__setup__()
         cls._error_messages.update({
                 'unfilled_edi_operational_point': (
-                    'Missing EDI Operational Point from party "%s"')
+                    'Missing EDI Operational Point from party "%s"'),
+                'unfilled_wh_edi_ean': (
+                    'Missing EDI EAN Warehouse code from address ID:"%s"')
                 })
 
     @staticmethod
@@ -78,15 +79,8 @@ class Purchase(metaclass=PoolMeta):
             return True
 
     @classmethod
-    def view_attributes(cls):
-        return super(Purchase, cls).view_attributes() + [
-            ('//page[@id="edi_page"]', 'states', {
-                'invisible': ~Bool(Eval('use_edi', False))
-            })]
-
-    @classmethod
-    def proceed(cls, purchases):
-        super(Purchase, cls).proceed(purchases)
+    def confirm(cls, purchases):
+        super(Purchase, cls).confirm(purchases)
         for purchase in purchases:
             if purchase.use_edi:
                 purchase._create_edi_order_file()
@@ -111,11 +105,14 @@ class Purchase(metaclass=PoolMeta):
         customer_delivery_address = self.warehouse.address if self.warehouse \
             and self.warehouse.address else \
             self._get_party_address(customer, 'delivery')
+        if not customer_delivery_address.edi_ean:
+            self.raise_user_error('unfilled_wh_edi_ean',
+                customer_delivery_address.id)
 
         header = 'ORDERS_D_96A_UN_EAN008'
         lines.append(header)
         edi_ord = 'ORD|{0}|{1}|{2}'.format(
-            self.reference[:17],  # limit 17 chars
+            self.number,  # limit 17 chars
             self.edi_order_type,
             self.edi_message_function)
         lines.append(edi_ord)
@@ -170,7 +167,7 @@ class Purchase(metaclass=PoolMeta):
             lines.append(edi_ctaby)
 
         edi_naddp = 'NADDP|{0}||{1}|{2}|{3}|{4}'.format(
-            customer.edi_operational_point,
+            customer_delivery_address.edi_ean,
             customer_delivery_address.party.name[:70],  # limit 70
             customer_delivery_address.street[:70],  # limit 70
             customer_delivery_address.city[:70],  # limit 70
