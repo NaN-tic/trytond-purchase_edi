@@ -55,7 +55,8 @@ class Purchase:
                 'unfilled_edi_operational_point': (
                     'Missing EDI Operational Point from party "%s"'),
                 'unfilled_wh_edi_ean': (
-                    'Missing EDI EAN Warehouse code from address ID:"%s"')
+                    'Missing EDI EAN Warehouse code from address ID:"%s"'),
+                'path_no_exists': ('Path location "%s" doesn\'t exists'),
                 })
 
     @staticmethod
@@ -211,6 +212,8 @@ class Purchase:
             lines.append(edi_lin.replace('\n', ''))
             edi_pialin = u'PIALIN|IN|{}'.format(product.code[:35])  # limit 35
             lines.append(edi_pialin.replace('\n', ''))
+            edi_pialin = u'PIALIN|CNA|{}'.format(product.code[:35])  # limit 35
+            lines.append(edi_pialin.replace('\n', ''))
             edi_imdlin = u'IMDLIN|F|||{}'.format(product.name[:70])  # limit 70
             lines.append(edi_imdlin.replace('\n', ''))
             edi_qtylin = u'QTYLIN|21|{0}|{1}'.format(
@@ -221,6 +224,9 @@ class Purchase:
                 edi_dtmlin = u'DTMLIN||||{}||'.format(
                     line.delivery_date.strftime(DATE_FORMAT))
                 lines.append(edi_dtmlin.replace('\n', ''))
+            edi_moalin = u'MOALIN|{}'.format(
+                    format(line.amount, '.6f')[:18])
+            lines.append(edi_moalin)
             if line.note:
                 edi_ftxlin = u'FTXLIN|{}|AAI'.format(line.note[:350])  # limit 350
                 lines.append(edi_ftxlin.replace('\n', ''))
@@ -234,11 +240,15 @@ class Purchase:
                 UOMS.get(line.unit.symbol, ''),
                 self.currency.code)
             lines.append(edi_prilin.replace('\n', ''))
+            if line.taxes:
+                tax = line.taxes[0].rate * 100
+                edi_taxlin = u'TAXLIN|VAT|{}'.format(tax)
+                lines.append(edi_taxlin)
             if line.discount:
                 discount_value = (
                     line.gross_unit_price - line.unit_price).normalize()
                 edi_alclin = u'ALCLIN|A|1|TD||{0}|{1}'.format(
-                    str(line.discount)[:8],  # limit 8
+                    str(line.discount*100)[:8],  # limit 8
                     str(discount_value)[:18])  # limit 18
                 lines.append(edi_alclin.replace('\n', ''))
 
@@ -253,6 +263,8 @@ class Purchase:
         purchase_config = PurchaseConfig(1)
         path_edi = os.path.abspath(purchase_config.path_edi or
             DEFAULT_FILES_LOCATION)
+        if not os.path.isdir(path_edi):
+            self.raise_user_error('path_no_exists', path_edi)
         content = self._make_edi_order_content()
         filename = '%s/order_%s.PLA' % (path_edi, self.id)
         with open(filename, 'w') as f:
