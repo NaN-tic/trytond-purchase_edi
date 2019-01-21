@@ -10,6 +10,10 @@ msgctxt "error:purchase.purchase:"
 msgid "Missing EDI Operational Point from party \"%s\""
 msgstr "Falta el Punto Operacional EDI para el tercero \"%s\"."
 
+msgctxt "error:purchase.purchase:"
+msgid "Path location \"%s\" doesn't exists"
+msgstr "El directorio \"%s\" no existe"
+
 msgctxt "field:purchase.configuration,path_edi:"
 msgid "Path EDI"
 msgstr "Directorio EDI"
@@ -62,6 +66,7 @@ msgctxt "selection:purchase.purchase,edi_order_type:"
 msgid "Partial order that cancels an open order"
 msgstr "Pedido parcial que cancela un pedido abierto."
 
+#, fuzzy
 msgctxt "selection:purchase.purchase,edi_special_condition:"
 msgid ""
 msgstr ""
