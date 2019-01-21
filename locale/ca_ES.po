@@ -10,6 +10,10 @@ msgctxt "error:purchase.purchase:"
 msgid "Missing EDI Operational Point from party \"%s\""
 msgstr "Falta el Punt Operacional EDI per el tercer \"%s\"."
 
+msgctxt "error:purchase.purchase:"
+msgid "Path location \"%s\" doesn't exists"
+msgstr "El directori \"%s\" no existeix"
+
 msgctxt "field:purchase.configuration,path_edi:"
 msgid "Path EDI"
 msgstr "Directori EDI"
