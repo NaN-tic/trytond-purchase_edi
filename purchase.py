@@ -71,7 +71,7 @@ class Purchase:
         states={
             'required': Bool(Eval('use_edi')),
             'readonly': ~Bool(Eval('use_edi') and Eval('party'))
-        }, depends=['use_edi'])
+        }, depends=['use_edi', 'party'])
 
     @classmethod
     def __setup__(cls):
