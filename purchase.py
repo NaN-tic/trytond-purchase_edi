@@ -3,6 +3,7 @@
 # copyright notices and license terms.
 from trytond.model import fields
 from trytond.pool import PoolMeta, Pool
+from trytond.pyson import Eval, Bool
 import os
 from unidecode import unidecode
 
@@ -29,24 +30,48 @@ class Purchase:
     __name__ = 'purchase.purchase'
 
     use_edi = fields.Boolean('Use EDI',
-        help='Use EDI protocol for this purchase')
+        help='Use EDI protocol for this purchase', states={
+                'readonly': ~Bool(Eval('party'))
+            }, depends=['party'])
     edi_order_type = fields.Selection([
             ('220', 'Normal Order'),
             ('226', 'Partial order that cancels an open order'),
-            ], string='Document Type')
+            ], string='Document Type',
+        states={
+                'required': Bool(Eval('use_edi')),
+                'readonly': ~Bool(Eval('use_edi'))
+            }, depends=['use_edi'])
     edi_message_function = fields.Selection([
             ('9', 'Original'),
             ('1', 'Cancellation'),
             ('4', 'Modification'),
             ('5', 'Replacement'),
             ('31', 'Copy'),
-            ], string='Message Function')
+            ], string='Message Function',
+        states={
+                'required': Bool(Eval('use_edi')),
+                'readonly': ~Bool(Eval('use_edi'))
+            }, depends=['use_edi'])
     edi_special_condition = fields.Selection([
             ('', ''),
             ('81E', 'Bill but not re-supply'),
             ('82E', 'Send but not invoice'),
             ('83E', 'Deliver the entire order'),
-            ], string='Special conditions, codified')
+            ], string='Special conditions, codified',
+        states={
+                'readonly': ~Bool(Eval('use_edi'))
+            }, depends=['use_edi'])
+
+    supplier_edi_operational_point = fields.Many2One('party.identifier',
+        'Supplier EDI Operational Point',
+        domain=[
+            ('party', '=', Eval('party')),
+            ('type', '=', 'edi')
+        ],
+        states={
+            'required': Bool(Eval('use_edi')),
+            'readonly': ~Bool(Eval('use_edi') and Eval('party'))
+        }, depends=['use_edi'])
 
     @classmethod
     def __setup__(cls):
@@ -79,6 +104,18 @@ class Purchase:
     def on_change_with_use_edi(self):
         if self.party and self.party.allow_edi:
             return True
+
+    @fields.depends('party')
+    def on_change_with_supplier_edi_operational_point(self):
+        pool = Pool()
+        PartyIdentifier = pool.get('party.identifier')
+        if self.party and self.party.allow_edi:
+            identifiers = PartyIdentifier.search([
+                    ('party', '=', self.party),
+                    ('type', '=', 'edi')])
+            if len(identifiers) == 1:
+                return identifiers[0].id
+        return None
 
     @classmethod
     def confirm(cls, purchases):
@@ -140,11 +177,11 @@ class Purchase:
                 )
         lines.append(edi_nadms.replace('\n', ''))
 
-        edi_nadmr = u'NADMR|{}'.format(supplier.edi_operational_point)
+        edi_nadmr = u'NADMR|{}'.format(self.supplier_edi_operational_point.code)
         lines.append(edi_nadmr.replace('\n', ''))
 
         edi_nadsu = u'NADSU|{0}|{1}|{2}|{3}|{4}||{5}'.format(
-                supplier.edi_operational_point,
+                self.supplier_edi_operational_point.code,
                 supplier.name[:70],  # limit 70
                 self.invoice_address.street[:70],  # limit 70
                 self.invoice_address.city[:70],  # limit 70
