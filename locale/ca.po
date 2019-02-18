@@ -30,6 +30,10 @@ msgctxt "field:purchase.purchase,edi_special_condition:"
 msgid "Special conditions, codified"
 msgstr "Condicions especials, codificat"
 
+msgctxt "field:purchase.purchase,supplier_edi_operational_point:"
+msgid "Supplier EDI Operational Point"
+msgstr "Punt Operacional EDI del Proveïdor"
+
 msgctxt "field:purchase.purchase,use_edi:"
 msgid "Use EDI"
 msgstr "Utilitza EDI"

@@ -30,6 +30,10 @@ msgctxt "field:purchase.purchase,edi_special_condition:"
 msgid "Special conditions, codified"
 msgstr "Condiciones especiales, codificado"
 
+msgctxt "field:purchase.purchase,supplier_edi_operational_point:"
+msgid "Supplier EDI Operational Point"
+msgstr "Punto Operacional EDI del Proveedor"
+
 msgctxt "field:purchase.purchase,use_edi:"
 msgid "Use EDI"
 msgstr "Utiliza EDI"
@@ -66,7 +70,6 @@ msgctxt "selection:purchase.purchase,edi_order_type:"
 msgid "Partial order that cancels an open order"
 msgstr "Pedido parcial que cancela un pedido abierto."
 
-#, fuzzy
 msgctxt "selection:purchase.purchase,edi_special_condition:"
 msgid ""
 msgstr ""
