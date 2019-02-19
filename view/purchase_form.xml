@@ -6,6 +6,7 @@
         <page string="EDI" id="edi_page">
             <label name="use_edi"/>
             <field name="use_edi"/>
+            <newline/>
             <label name="edi_order_type"/>
             <field name="edi_order_type"/>
             <newline/>
@@ -14,6 +15,9 @@
             <newline/>
             <label name="edi_special_condition"/>
             <field name="edi_special_condition"/>
+            <newline/>
+            <label name="supplier_edi_operational_point"/>
+            <field name="supplier_edi_operational_point"/>
         </page>
     </xpath>
 </data>
