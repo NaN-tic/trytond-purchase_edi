@@ -3,8 +3,12 @@
 # copyright notices and license terms.
 from trytond.model import fields
 from trytond.pool import PoolMeta, Pool
+from trytond.pyson import Eval, Bool
 import os
 from unidecode import unidecode
+from trytond.i18n import gettext
+from trytond.exceptions import UserError
+
 
 __all__ = ['Purchase', 'PurchaseConfiguration']
 
@@ -28,35 +32,48 @@ class Purchase(metaclass=PoolMeta):
     __name__ = 'purchase.purchase'
 
     use_edi = fields.Boolean('Use EDI',
-        help='Use EDI protocol for this purchase')
+        help='Use EDI protocol for this purchase', states={
+                'readonly': ~Bool(Eval('party'))
+            }, depends=['party'])
     edi_order_type = fields.Selection([
             ('220', 'Normal Order'),
             ('226', 'Partial order that cancels an open order'),
-            ], string='Document Type')
+            ], string='Document Type',
+        states={
+                'required': Bool(Eval('use_edi')),
+                'readonly': ~Bool(Eval('use_edi'))
+            }, depends=['use_edi'])
     edi_message_function = fields.Selection([
             ('9', 'Original'),
             ('1', 'Cancellation'),
             ('4', 'Modification'),
             ('5', 'Replacement'),
             ('31', 'Copy'),
-            ], string='Message Function')
+            ], string='Message Function',
+        states={
+                'required': Bool(Eval('use_edi')),
+                'readonly': ~Bool(Eval('use_edi'))
+            }, depends=['use_edi'])
     edi_special_condition = fields.Selection([
             ('', ''),
             ('81E', 'Bill but not re-supply'),
             ('82E', 'Send but not invoice'),
             ('83E', 'Deliver the entire order'),
-            ], string='Special conditions, codified')
+            ], string='Special conditions, codified',
+        states={
+                'readonly': ~Bool(Eval('use_edi'))
+            }, depends=['use_edi'])
 
-    @classmethod
-    def __setup__(cls):
-        super(Purchase, cls).__setup__()
-        cls._error_messages.update({
-                'unfilled_edi_operational_point': (
-                    'Missing EDI Operational Point from party "%s"'),
-                'unfilled_wh_edi_ean': (
-                    'Missing EDI EAN Warehouse code from address ID:"%s"'),
-                'path_no_exists': ('Path location "%s" doesn\'t exists'),
-                })
+    supplier_edi_operational_point = fields.Many2One('party.identifier',
+        'Supplier EDI Operational Point',
+        domain=[
+            ('party', '=', Eval('party')),
+            ('type', '=', 'edi')
+        ],
+        states={
+            'required': Bool(Eval('use_edi')),
+            'readonly': ~Bool(Eval('use_edi') and Eval('party'))
+        }, depends=['use_edi', 'party'])
 
     @staticmethod
     def default_use_edi():
@@ -79,6 +96,18 @@ class Purchase(metaclass=PoolMeta):
         if self.party and self.party.allow_edi:
             return True
 
+    @fields.depends('party')
+    def on_change_with_supplier_edi_operational_point(self):
+        pool = Pool()
+        PartyIdentifier = pool.get('party.identifier')
+        if self.party and self.party.allow_edi:
+            identifiers = PartyIdentifier.search([
+                    ('party', '=', self.party),
+                    ('type', '=', 'edi')])
+            if len(identifiers) == 1:
+                return identifiers[0].id
+        return None
+
     @classmethod
     def confirm(cls, purchases):
         super(Purchase, cls).confirm(purchases)
@@ -100,15 +129,15 @@ class Purchase(metaclass=PoolMeta):
         supplier = self.party
         for party in (customer, supplier):
             if not party.edi_operational_point:
-                self.raise_user_error('unfilled_edi_operational_point',
-                    party.rec_name)
+                raise UserError(gettext('unfilled_edi_operational_point',
+                        party=party.rec_name))
         customer_invoice_address = self._get_party_address(customer, 'invoice')
         customer_delivery_address = self.warehouse.address if self.warehouse \
             and self.warehouse.address else \
             self._get_party_address(customer, 'delivery')
         if not customer_delivery_address.edi_ean:
-            self.raise_user_error('unfilled_wh_edi_ean',
-                customer_delivery_address.id)
+            raise UserError(gettext('unfilled_wh_edi_ean',
+                    address=customer_delivery_address.id))
 
         header = 'ORDERS_D_96A_UN_EAN008'
         lines.append(header)
@@ -139,11 +168,11 @@ class Purchase(metaclass=PoolMeta):
                 )
         lines.append(edi_nadms.replace('\n', ''))
 
-        edi_nadmr = 'NADMR|{}'.format(supplier.edi_operational_point)
+        edi_nadmr = 'NADMR|{}'.format(self.supplier_edi_operational_point.code)
         lines.append(edi_nadmr.replace('\n', ''))
 
-        edi_nadsu = 'NADSU|{0}|{1}|{2}|{3}|{4}|{5}'.format(
-                supplier.edi_operational_point,
+        edi_nadsu = 'NADSU|{0}|{1}|{2}|{3}|{4}||{5}'.format(
+                self.supplier_edi_operational_point.code,
                 supplier.name[:70],  # limit 70
                 self.invoice_address.street[:70],  # limit 70
                 self.invoice_address.city[:70],  # limit 70
@@ -263,7 +292,8 @@ class Purchase(metaclass=PoolMeta):
         path_edi = os.path.abspath(purchase_config.path_edi or
             DEFAULT_FILES_LOCATION)
         if not os.path.isdir(path_edi):
-            self.raise_user_error('path_no_exists', path_edi)
+            raise UserError(gettext('path_no_exists',
+                    path=path_edi))
         content = self._make_edi_order_content()
         filename = '%s/order_%s.PLA' % (path_edi, self.id)
         with open(filename, 'w') as f:
