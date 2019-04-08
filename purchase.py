@@ -154,18 +154,18 @@ class Purchase:
             self.number,  # limit 17 chars
             self.edi_order_type,
             self.edi_message_function)
-        lines.append(edi_ord.replace('\n', ''))
+        lines.append(edi_ord.replace('\n', '').replace('\r', ''))
 
         edi_dtm = u'DTM|{}'.format(self.purchase_date.strftime(DATE_FORMAT))
-        lines.append(edi_dtm.replace('\n', ''))
+        lines.append(edi_dtm.replace('\n', '').replace('\r', ''))
 
         if self.edi_special_condition:
             edi_ali = u'ALI|{}'.format(self.edi_special_condition)
-            lines.append(edi_ali.replace('\n', ''))
+            lines.append(edi_ali.replace('\n', '').replace('\r', ''))
 
         if self.comment:
             edi_ftx = u'FTX|AAI||{}'.format(self.comment[:280])  # limit 280 chars
-            lines.append(edi_ftx.replace('\n', ''))
+            lines.append(edi_ftx.replace('\n', '').replace('\r', ''))
 
         edi_nadms = u'NADMS|{0}|{1}|{2}|{3}|{4}|{5}'.format(
                 customer.edi_operational_point,
@@ -175,12 +175,12 @@ class Purchase:
                 customer_invoice_address.zip[:10],  # limit 10
                 customer.vat_code[:10]  # limit 10
                 )
-        lines.append(edi_nadms.replace('\n', ''))
+        lines.append(edi_nadms.replace('\n', '').replace('\r', ''))
 
         edi_nadmr = u'NADMR|{}'.format(self.supplier_edi_operational_point.code)
-        lines.append(edi_nadmr.replace('\n', ''))
+        lines.append(edi_nadmr.replace('\n', '').replace('\r', ''))
 
-        edi_nadsu = u'NADSU|{0}|{1}|{2}|{3}|{4}||{5}'.format(
+        edi_nadsu = u'NADSU|{0}||{1}|{2}|{3}|{4}|{5}'.format(
                 self.supplier_edi_operational_point.code,
                 supplier.name[:70],  # limit 70
                 self.invoice_address.street[:70],  # limit 70
@@ -188,7 +188,7 @@ class Purchase:
                 self.invoice_address.zip[:10],  # limit 10
                 supplier.vat_code[:10]  # limit 10
                 )
-        lines.append(edi_nadsu.replace('\n', ''))
+        lines.append(edi_nadsu.replace('\n', '').replace('\r', ''))
 
         edi_nadby = u'NADBY|{0}||||{1}|{2}|{3}|{4}|{5}'.format(
             customer.edi_operational_point,
@@ -198,12 +198,12 @@ class Purchase:
             customer_invoice_address.zip[:10],  # limit 10
             customer.vat_code[:10]  # limit 10
             )
-        lines.append(edi_nadby.replace('\n', ''))
+        lines.append(edi_nadby.replace('\n', '').replace('\r', ''))
 
         if customer_invoice_address.name:
             edi_ctaby = u'CTABY|OC|{}'.format(
                 customer_invoice_address.name[:35])  # limit 35
-            lines.append(edi_ctaby.replace('\n', ''))
+            lines.append(edi_ctaby.replace('\n', '').replace('\r', ''))
 
         edi_naddp = u'NADDP|{0}||{1}|{2}|{3}|{4}'.format(
             customer_delivery_address.edi_ean,
@@ -212,12 +212,12 @@ class Purchase:
             customer_delivery_address.city[:70],  # limit 70
             customer_delivery_address.zip[:10],  # limit 10
             )
-        lines.append(edi_naddp.replace('\n', ''))
+        lines.append(edi_naddp.replace('\n', '').replace('\r', ''))
 
         if customer_delivery_address.name:
             edi_ctadp = u'CTADP|OC|{}'.format(
                 customer_delivery_address.name[:35])  # limit 35
-            lines.append(edi_ctadp.replace('\n', ''))
+            lines.append(edi_ctadp.replace('\n', '').replace('\r', ''))
 
         party_cm = customer_delivery_address.party.contact_mechanisms
         for contact_mechanism in party_cm:
@@ -236,47 +236,47 @@ class Purchase:
                 customer_invoice_address.zip[:70],  # limit 10
                 customer.vat_code[:10]  # limit 10
                 )
-        lines.append(edi_nadiv.replace('\n', ''))
+        lines.append(edi_nadiv.replace('\n', '').replace('\r', ''))
 
         edi_cux = u'CUX|{}'.format(self.currency.code)
-        lines.append(edi_cux.replace('\n', ''))
+        lines.append(edi_cux.replace('\n', '').replace('\r', ''))
 
         for index, line in enumerate(self.lines):
             product = line.product
             edi_lin = u'LIN|{0}|EN|{1}'.format(
                 product.code_ean13,
                 str(index + 1))
-            lines.append(edi_lin.replace('\n', ''))
+            lines.append(edi_lin.replace('\n', '').replace('\r', ''))
             edi_pialin = u'PIALIN|IN|{}'.format(product.code[:35])  # limit 35
-            lines.append(edi_pialin.replace('\n', ''))
+            lines.append(edi_pialin.replace('\n', '').replace('\r', ''))
             edi_pialin = u'PIALIN|CNA|{}'.format(product.code[:35])  # limit 35
-            lines.append(edi_pialin.replace('\n', ''))
+            lines.append(edi_pialin.replace('\n', '').replace('\r', ''))
             edi_imdlin = u'IMDLIN|F|||{}'.format(product.name[:70])  # limit 70
-            lines.append(edi_imdlin.replace('\n', ''))
+            lines.append(edi_imdlin.replace('\n', '').replace('\r', ''))
             edi_qtylin = u'QTYLIN|21|{0}|{1}'.format(
                 str(int(line.quantity) or 0),  # limit 15
                 UOMS.get(line.unit.symbol, ''))
-            lines.append(edi_qtylin.replace('\n', ''))
+            lines.append(edi_qtylin.replace('\n', '').replace('\r', ''))
             if line.delivery_date:
                 edi_dtmlin = u'DTMLIN||||{}||'.format(
                     line.delivery_date.strftime(DATE_FORMAT))
-                lines.append(edi_dtmlin.replace('\n', ''))
+                lines.append(edi_dtmlin.replace('\n', '').replace('\r', ''))
             edi_moalin = u'MOALIN|{}'.format(
                     format(line.amount, '.6f')[:18])
             lines.append(edi_moalin)
             if line.note:
                 edi_ftxlin = u'FTXLIN|{}|AAI'.format(line.note[:350])  # limit 350
-                lines.append(edi_ftxlin.replace('\n', ''))
+                lines.append(edi_ftxlin.replace('\n', '').replace('\r', ''))
             edi_prilin = u'PRILIN|AAA|{0}'.format(
                 format(line.unit_price, '.6f')[:18],  # limit 18
                 UOMS.get(line.unit.symbol, ''),
                 self.currency.code)
-            lines.append(edi_prilin.replace('\n', ''))
+            lines.append(edi_prilin.replace('\n', '').replace('\r', ''))
             edi_prilin = u'PRILIN|AAB|{0}'.format(
                 format(line.gross_unit_price, '.6f')[:18],  # limit 18
                 UOMS.get(line.unit.symbol, ''),
                 self.currency.code)
-            lines.append(edi_prilin.replace('\n', ''))
+            lines.append(edi_prilin.replace('\n', '').replace('\r', ''))
             if line.taxes:
                 tax = line.taxes[0].rate * 100
                 edi_taxlin = u'TAXLIN|VAT|{}'.format(tax)
@@ -285,9 +285,9 @@ class Purchase:
                 discount_value = (
                     line.gross_unit_price - line.unit_price).normalize()
                 edi_alclin = u'ALCLIN|A|1|TD||{0}|{1}'.format(
-                    str(line.discount*100)[:8],  # limit 8
+                    str(line.discount * 100)[:8],  # limit 8
                     str(discount_value)[:18])  # limit 18
-                lines.append(edi_alclin.replace('\n', ''))
+                lines.append(edi_alclin.replace('\n', '').replace('\r', ''))
 
         edi_moares = u'MOARES|{}\r\n'.format(str(self.total_amount)[:18])  # limit 18
         lines.append(edi_moares)
