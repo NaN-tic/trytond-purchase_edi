@@ -4,7 +4,9 @@
 <data>
     <xpath expr="/form/field[@name='purchase_invoice_method']"
         position="after">
+        <newline/>
+        <separator id="edi_conf_group" string="EDI" colspan="4"/>
         <label name="path_edi"/>
-        <field name="path_edi"/>
+        <field name="path_edi" colspan="3"/>
     </xpath>
 </data>
