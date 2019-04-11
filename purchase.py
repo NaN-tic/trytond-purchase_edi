@@ -131,6 +131,10 @@ class Purchase:
                 return address
         return party.addresses[0]
 
+    def __get_edi_cm(self, cm):
+        cm_type = CM_TYPES.get(cm.type, '')
+        return cm_type, cm.value
+
     def _make_edi_order_content(self):
 
         lines = []
@@ -221,11 +225,11 @@ class Purchase:
 
         party_cm = customer_delivery_address.party.contact_mechanisms
         for contact_mechanism in party_cm:
-            contact_mechanism_type = CM_TYPES.get(contact_mechanism.type, '')
-            if contact_mechanism_type:
+            cm_type, cm_value = self.__get_edi_cm(contact_mechanism)
+            if cm_type:
                 edi_comdp = u'COMDP|{0}|{1}'.format(
-                        contact_mechanism_type,
-                        contact_mechanism.value[:35])  # limit 35
+                        cm_type,
+                        cm_value[:35])  # limit 35
                 lines.append(edi_comdp.replace('\n', ''))
 
         edi_nadiv = u'NADIV|{0}||{1}|{2}|{3}|{4}|{5}'.format(
