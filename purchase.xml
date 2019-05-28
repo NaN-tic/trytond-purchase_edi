@@ -9,11 +9,41 @@
             <field name="inherit" ref="purchase.purchase_view_form"/>
             <field name="name">purchase_form</field>
         </record>
+        <record model="ir.ui.view" id="purchase_view_tree">
+            <field name="model">purchase.purchase</field>
+            <field name="inherit" ref="purchase.purchase_view_tree"/>
+            <field name="name">purchase_tree</field>
+        </record>
         <!-- purchase.configuration -->
         <record model="ir.ui.view" id="purchase_configuration_view_form">
             <field name="model">purchase.configuration</field>
             <field name="inherit" ref="purchase.purchase_configuration_view_form"/>
             <field name="name">purchase_configuration_form</field>
+        </record>
+        <!-- EDI Orders User -->
+        <record model="res.user" id="user_edi_orders">
+            <field name="login">user_edi_orders</field>
+            <field name="name">Cron EDI Orders</field>
+            <field name="signature"></field>
+            <field name="active" eval="False"/>
+        </record>
+        <record model="res.user-res.group"
+            id="user_edi_orders_group_admin">
+            <field name="user" ref="user_edi_orders"/>
+            <field name="group" ref="res.group_admin"/>
+        </record>
+        <!-- Update EDI Purchase Orders state cron -->
+        <record model="ir.cron" id="cron_update_edi_orders_state">
+            <field name="name">Update EDI Orders</field>
+            <field name="request_user" ref="res.user_admin"/>
+            <field name="user" ref="user_edi_orders"/>
+            <field name="active" eval="True"/>
+            <field name="interval_number" eval="1"/>
+            <field name="interval_type">days</field>
+            <field name="number_calls" eval="-1"/>
+            <field name="repeat_missed" eval="False"/>
+            <field name="model">purchase.purchase</field>
+            <field name="function">update_edi_orders_state_cron</field>
         </record>
     </data>
 </tryton>
