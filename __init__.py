@@ -5,6 +5,7 @@ from . import purchase
 
 def register():
     Pool.register(
+        purchase.Cron,
         purchase.Purchase,
         purchase.PurchaseConfiguration,
         module='purchase_edi', type_='model')
