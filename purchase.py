@@ -3,19 +3,27 @@
 # copyright notices and license terms.
 from trytond.model import fields
 from trytond.pool import PoolMeta, Pool
-from trytond.pyson import Eval, Bool
+from trytond.pyson import Eval, Bool, Or
 import os
+from glob import glob
 from unidecode import unidecode
+from datetime import datetime
+from trytond import backend
+
 
 __all__ = ['Purchase', 'PurchaseConfiguration']
 
 
 DEFAULT_FILES_LOCATION = '/tmp/'
+# Tryton to EDI UOMS mapping
 UOMS = {
     'kg': u'KGM',
     'u': u'PCE',
-    'l': u'LTR'
+    'l': u'LTR',
+    'g': u'GRM',
+    'm': u'MTR',
 }
+
 CM_TYPES = {
     'phone': u'TE',
     'mobile': u'TE',
@@ -31,47 +39,59 @@ class Purchase:
 
     use_edi = fields.Boolean('Use EDI',
         help='Use EDI protocol for this purchase', states={
-                'readonly': ~Bool(Eval('party'))
-            }, depends=['party'])
+            'readonly': Or(~Bool(Eval('party')), Bool(Eval('edi_state')))
+            }, depends=['party', 'edi_state'])
     edi_order_type = fields.Selection([
             ('220', 'Normal Order'),
             ('226', 'Partial order that cancels an open order'),
-            ], string='Document Type',
-        states={
+            ], 'Document Type', states={
                 'required': Bool(Eval('use_edi')),
-                'readonly': ~Bool(Eval('use_edi'))
-            }, depends=['use_edi'])
+                'invisible': ~Bool(Eval('use_edi')),
+                'readonly': Or(~Bool(Eval('use_edi')), Bool(Eval('edi_state')))
+            }, depends=['use_edi', 'edi_state'])
     edi_message_function = fields.Selection([
             ('9', 'Original'),
             ('1', 'Cancellation'),
             ('4', 'Modification'),
             ('5', 'Replacement'),
             ('31', 'Copy'),
-            ], string='Message Function',
-        states={
+            ], 'Message Function', states={
+                'invisible': ~Bool(Eval('use_edi')),
                 'required': Bool(Eval('use_edi')),
-                'readonly': ~Bool(Eval('use_edi'))
-            }, depends=['use_edi'])
+                'readonly': Or(~Bool(Eval('use_edi')), Bool(Eval('edi_state')))
+            }, depends=['use_edi', 'edi_state'])
     edi_special_condition = fields.Selection([
-            ('', ''),
+            (None, ''),
             ('81E', 'Bill but not re-supply'),
             ('82E', 'Send but not invoice'),
             ('83E', 'Deliver the entire order'),
-            ], string='Special conditions, codified',
-        states={
-                'readonly': ~Bool(Eval('use_edi'))
-            }, depends=['use_edi'])
-
+            ], 'Special conditions, codified', states={
+                'invisible': ~Bool(Eval('use_edi')),
+                'readonly': Or(~Bool(Eval('use_edi')), Bool(Eval('edi_state')))
+            }, depends=['use_edi', 'edi_state'])
     supplier_edi_operational_point = fields.Many2One('party.identifier',
         'Supplier EDI Operational Point',
         domain=[
             ('party', '=', Eval('party')),
-            ('type', '=', 'edi')
-        ],
+            ('type', '=', 'edi')],
         states={
+            'invisible': ~Bool(Eval('use_edi')),
             'required': Bool(Eval('use_edi')),
-            'readonly': ~Bool(Eval('use_edi') and Eval('party'))
-        }, depends=['use_edi', 'party'])
+            'readonly': Or(~Bool(Eval('use_edi')), Bool(Eval('edi_state')))
+            }, depends=['use_edi', 'edi_state'])
+    edi_state = fields.Selection([
+        (None, 'None'),
+        ('pending', 'Pending'),
+        ('sended', 'Sended'),
+        ], 'EDI Communication State', states={
+            'readonly': True,
+            'invisible': ~Bool(Eval('use_edi')),
+            }, depends=['use_edi'],
+        help='State of the EDI communication')
+    sended_on = fields.DateTime('Sended On', states={
+            'readonly': True,
+            'invisible': Eval('edi_state').in_(['pending', None]),
+            }, depends=['edi_state'])
 
     @classmethod
     def __setup__(cls):
@@ -83,6 +103,13 @@ class Purchase:
                     'Missing EDI EAN Warehouse code from address ID:"%s"'),
                 'path_no_exists': ('Path location "%s" doesn\'t exists'),
                 })
+
+    @classmethod
+    def view_attributes(cls):
+        return super(Purchase, cls).view_attributes() + [
+            ('//separator[@id="outgoing_msg"]', 'states', {
+                    'invisible': (~Bool(Eval('use_edi'))),
+                    })]
 
     @staticmethod
     def default_use_edi():
@@ -99,6 +126,19 @@ class Purchase:
     @staticmethod
     def default_edi_special_condition():
         return ''
+
+    @classmethod
+    def copy(cls, purchases, default=None):
+        if default is None:
+            default = {}
+        default = default.copy()
+        default['use_edi'] = cls.default_use_edi()
+        default['edi_order_type'] = cls.default_edi_order_type()
+        default['edi_message_function'] = cls.default_edi_message_function()
+        default['edi_special_condition'] = cls.default_edi_special_condition()
+        default['edi_state'] = None
+        default['sended_on'] = None
+        return super(Purchase, cls).copy(purchases, default=default)
 
     @fields.depends('party')
     def on_change_with_use_edi(self):
@@ -123,6 +163,8 @@ class Purchase:
         for purchase in purchases:
             if purchase.use_edi:
                 purchase._create_edi_order_file()
+                purchase.edi_state = 'pending'
+                purchase.save()
 
     def _get_party_address(self, party, address_type):
         for address in party.addresses:
@@ -302,18 +344,78 @@ class Purchase:
         pool = Pool()
         PurchaseConfig = pool.get('purchase.configuration')
         purchase_config = PurchaseConfig(1)
-        path_edi = os.path.abspath(purchase_config.path_edi or
+        path_edi = os.path.abspath(purchase_config.outbox_path_edi or
             DEFAULT_FILES_LOCATION)
         if not os.path.isdir(path_edi):
             self.raise_user_error('path_no_exists', path_edi)
         content = self._make_edi_order_content()
-        filename = '%s/order_%s.PLA' % (path_edi, self.id)
-        with open(filename, 'w') as f:
-            f.write(content.encode('utf-8'))
+        content = content.encode('utf-8')
+        filename = 'order_{}.PLA'.format(self.number)
+        with open('{}/{}'.format(path_edi, filename), 'w') as f:
+            f.write(content)
+        self.add_attachment(content, filename)
+
+    def add_attachment(self, attachment, filename=None):
+        pool = Pool()
+        Attachment = pool.get('ir.attachment')
+        if not filename:
+            filename = datetime.now().strftime("%y/%m/%d %H:%M:%S")
+        attach = Attachment(
+            name=filename,
+            type='data',
+            data=attachment,
+            resource=str(self))
+        attach.save()
+
+    @classmethod
+    def update_edi_orders_state(cls):
+        pool = Pool()
+        Attachment = pool.get('ir.attachment')
+        PurchaseConfig = pool.get('purchase.configuration')
+        purchase_config = PurchaseConfig(1)
+        path_edi = os.path.abspath(purchase_config.outbox_path_edi or
+            DEFAULT_FILES_LOCATION)
+        old_cwd = os.getcwd()
+        os.chdir(path_edi)
+        files = glob("order*.*")
+        os.chdir(old_cwd)
+        pending = set(cls.search([
+                ('use_edi', '=', True),
+                ('edi_state', '=', 'pending')]))
+        attachments = Attachment.search([('name', 'in', files)])
+        not_sended = set([a.resource for a in attachments])
+        sended = list(pending - not_sended)
+        if sended:
+            now = datetime.now()
+            cls.write(sended, {
+                'edi_state': 'sended',
+                'sended_on': now,
+                })
+
+    @classmethod
+    def update_edi_orders_state_cron(cls):
+        """
+        Cron update edi orders state:
+        - State: active
+        """
+        cls.update_edi_orders_state()
+        return True
 
 
 class PurchaseConfiguration:
     __metaclass__ = PoolMeta
     __name__ = 'purchase.configuration'
 
-    path_edi = fields.Char('Path EDI')
+    outbox_path_edi = fields.Char('Outbox Path EDI')
+
+    @classmethod
+    def __register__(cls, module_name):
+        TableHandler = backend.get('TableHandler')
+        table = TableHandler(cls, module_name)
+
+        # Migration from old module versions
+        if (not table.column_exist('outbox_path_edi') and
+                table.column_exist('path_edi')):
+            table.column_rename('path_edi',
+                'outbox_path_edi')
+        super(PurchaseConfiguration, cls).__register__(module_name)

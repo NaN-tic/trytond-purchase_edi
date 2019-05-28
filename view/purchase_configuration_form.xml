@@ -6,7 +6,7 @@
         position="after">
         <newline/>
         <separator id="edi_conf_group" string="EDI" colspan="4"/>
-        <label name="path_edi"/>
-        <field name="path_edi" colspan="3"/>
+        <label name="outbox_path_edi"/>
+        <field name="outbox_path_edi" colspan="3"/>
     </xpath>
 </data>
