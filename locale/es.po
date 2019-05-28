@@ -14,10 +14,6 @@ msgctxt "error:purchase.purchase:"
 msgid "Path location \"%s\" doesn't exists"
 msgstr "El directorio \"%s\" no existe"
 
-msgctxt "field:purchase.configuration,path_edi:"
-msgid "Path EDI"
-msgstr "Directorio EDI"
-
 msgctxt "field:purchase.purchase,edi_message_function:"
 msgid "Message Function"
 msgstr "Función del mensaje"
@@ -30,6 +26,14 @@ msgctxt "field:purchase.purchase,edi_special_condition:"
 msgid "Special conditions, codified"
 msgstr "Condiciones especiales, codificado"
 
+msgctxt "field:purchase.purchase,edi_state:"
+msgid "EDI Communication State"
+msgstr "Estado de Comunicación"
+
+msgctxt "field:purchase.purchase,sended_on:"
+msgid "Sended On"
+msgstr "Fecha de envio"
+
 msgctxt "field:purchase.purchase,supplier_edi_operational_point:"
 msgid "Supplier EDI Operational Point"
 msgstr "Punto Operacional EDI del Proveedor"
@@ -38,9 +42,21 @@ msgctxt "field:purchase.purchase,use_edi:"
 msgid "Use EDI"
 msgstr "Utiliza EDI"
 
+msgctxt "help:purchase.purchase,edi_state:"
+msgid "State of the EDI communication"
+msgstr "Estado de la comunicacion EDI"
+
 msgctxt "help:purchase.purchase,use_edi:"
 msgid "Use EDI protocol for this purchase"
 msgstr "Usa el protocolo EDI para esta compra"
+
+msgctxt "model:ir.cron,name:cron_update_edi_orders_state"
+msgid "Update EDI Orders"
+msgstr "Actualizar ordenes EDI"
+
+msgctxt "model:res.user,name:user_edi_orders"
+msgid "Cron EDI Orders"
+msgstr "Cron Ordenes EDI"
 
 msgctxt "selection:purchase.purchase,edi_message_function:"
 msgid "Cancellation"
@@ -86,6 +102,30 @@ msgctxt "selection:purchase.purchase,edi_special_condition:"
 msgid "Send but not invoice"
 msgstr "Enviar pero no facturar"
 
+msgctxt "selection:purchase.purchase,edi_state:"
+msgid "Answered"
+msgstr "Respondido"
+
+msgctxt "selection:purchase.purchase,edi_state:"
+msgid "None"
+msgstr "Ninguno"
+
+msgctxt "selection:purchase.purchase,edi_state:"
+msgid "Pending"
+msgstr "Pendiente"
+
+msgctxt "selection:purchase.purchase,edi_state:"
+msgid "Sended"
+msgstr "Enviado"
+
+msgctxt "view:purchase.configuration:"
+msgid "EDI"
+msgstr "EDI"
+
 msgctxt "view:purchase.purchase:"
 msgid "EDI"
 msgstr "EDI"
+
+msgctxt "view:purchase.purchase:"
+msgid "Outgoing Message"
+msgstr "Mensaje saliente"
