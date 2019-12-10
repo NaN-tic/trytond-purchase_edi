@@ -409,8 +409,7 @@ class PurchaseConfiguration(metaclass=PoolMeta):
 
     @classmethod
     def __register__(cls, module_name):
-        TableHandler = backend.get('TableHandler')
-        table = TableHandler(cls, module_name)
+        table = backend.TableHandler(cls, module_name)
 
         # Migration from old module versions
         if (not table.column_exist('outbox_path_edi') and
