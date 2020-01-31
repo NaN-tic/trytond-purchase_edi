@@ -205,6 +205,9 @@ class Purchase:
         edi_dtm = u'DTM|{}'.format(self.purchase_date.strftime(DATE_FORMAT))
         lines.append(edi_dtm.replace('\n', '').replace('\r', ''))
 
+        edi_rff = u'RFF||{}'.format(self.reference)
+        lines.append(edi_rff)
+
         if self.edi_special_condition:
             edi_ali = u'ALI|{}'.format(self.edi_special_condition)
             lines.append(edi_ali.replace('\n', '').replace('\r', ''))
