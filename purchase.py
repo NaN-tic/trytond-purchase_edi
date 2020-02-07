@@ -204,7 +204,7 @@ class Purchase(metaclass=PoolMeta):
         edi_dtm = 'DTM|{}'.format(self.purchase_date.strftime(DATE_FORMAT))
         lines.append(edi_dtm.replace('\n', '').replace('\r', ''))
 
-        edi_rff = u'RFF||{}'.format(self.reference)
+        edi_rff = u'RFF|VN|{}'.format(self.reference)
         lines.append(edi_rff)
 
         if self.edi_special_condition:
