@@ -45,5 +45,17 @@
             <field name="model">purchase.purchase</field>
             <field name="function">update_edi_orders_state_cron</field>
         </record>
+
+        <!-- Button -->
+        <record model="ir.model.button" id="cancel_edi_purchase_button">
+            <field name="name">cancel_purchase_edi</field>
+            <field name="model" search="[('model', '=', 'purchase.purchase')]"/>
+        </record>
+        <record model="ir.model.button-res.group"
+            id="cancel_edi_purchase_button_group_admin">
+            <field name="button" ref="cancel_edi_purchase_button"/>
+            <field name="group" ref="purchase.group_purchase"/>
+        </record>
+
     </data>
 </tryton>
