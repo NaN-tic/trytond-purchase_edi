@@ -7,6 +7,9 @@
             <label name="use_edi"/>
             <field name="use_edi"/>
             <newline/>
+            <label name="resend_edi"/>
+            <field name="resend_edi"/>
+            <newline/>
             <label name="edi_state"/>
             <field name="edi_state"/>
             <newline/>
@@ -21,10 +24,16 @@
             <field name="edi_special_condition" colspan="3"/>
             <newline/>
             <label name="supplier_edi_operational_point"/>
-            <field name="supplier_edi_operational_point"/> 
+            <field name="supplier_edi_operational_point"/>
             <newline/>
             <label name="sended_on"/>
             <field name="sended_on" widget="datetime" colspan="3"/>
         </page>
+    </xpath>
+
+    <xpath
+        expr="/form/notebook/page[@id='purchase']/group/group/button[@name='cancel']"
+        position="before">
+        <button name="cancel_purchase_edi" string="Cancel Edi" icon="tryton-cancel"/>
     </xpath>
 </data>

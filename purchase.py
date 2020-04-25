@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*
 # The COPYRIGHT file at the top level of this repository contains the full
 # copyright notices and license terms.
-from trytond.model import fields
+from trytond.model import fields, ModelView
 from trytond.pool import PoolMeta, Pool
 from trytond.pyson import Eval, Bool, Or
 import os
@@ -90,7 +90,6 @@ class Purchase(metaclass=PoolMeta):
             'readonly': Or(~Bool(Eval('use_edi')), Bool(Eval('edi_state')))
             }, depends=['use_edi', 'edi_state', 'party'])
     edi_state = fields.Selection([
-        (None, 'None'),
         ('pending', 'Pending'),
         ('sended', 'Sended'),
         ], 'EDI Communication State', states={
@@ -98,10 +97,29 @@ class Purchase(metaclass=PoolMeta):
             'invisible': ~Bool(Eval('use_edi')),
             }, depends=['use_edi'],
         help='State of the EDI communication')
+    resend_edi = fields.Selection([
+        ('resend', 'Resend'),
+        ('no_resend', 'No Resend'),
+        ], 'Resend Purchase', states={
+            'invisible': ~Bool(Eval('use_edi')),
+            }, depends=['use_edi'],
+        help='Resend again when purchase is confirmed')
+
     sended_on = fields.DateTime('Sended On', states={
             'readonly': True,
             'invisible': Eval('edi_state').in_(['pending', None]),
             }, depends=['edi_state'])
+
+    @classmethod
+    def __setup__(cls):
+        super(Purchase, cls).__setup__()
+        cls._buttons.update({
+            'cancel_purchase_edi': {
+                'invisible': (~Eval('state').in_(
+                    ['confirmed', 'processing', 'cancel']) |
+                        ~Bool(Eval('use_edi')))
+            },
+        })
 
     @classmethod
     def view_attributes(cls):
@@ -109,6 +127,10 @@ class Purchase(metaclass=PoolMeta):
             ('//separator[@id="outgoing_msg"]', 'states', {
                     'invisible': (~Bool(Eval('use_edi'))),
                     })]
+
+    @staticmethod
+    def default_resend_edi():
+        return 'resend'
 
     @staticmethod
     def default_use_edi():
@@ -160,10 +182,12 @@ class Purchase(metaclass=PoolMeta):
     def confirm(cls, purchases):
         super(Purchase, cls).confirm(purchases)
         for purchase in purchases:
-            if purchase.use_edi:
+            if purchase.use_edi and purchase.resend_edi == 'resend':
                 purchase._create_edi_order_file()
                 purchase.edi_state = 'pending'
                 purchase.save()
+
+
 
     def _get_party_address(self, party, address_type):
         for address in party.addresses:
@@ -361,8 +385,9 @@ class Purchase(metaclass=PoolMeta):
     def add_attachment(self, attachment, filename=None):
         pool = Pool()
         Attachment = pool.get('ir.attachment')
-        if not filename:
-            filename = datetime.now().strftime("%y/%m/%d %H:%M:%S")
+        str_date = datetime.now().strftime("%y/%m/%d %H:%M:%S")
+        filename = "%(filename)s-%(date)s" % ({'filename':filename or '',
+            'date':str_date})
         attach = Attachment(
             name=filename,
             type='data',
@@ -403,6 +428,15 @@ class Purchase(metaclass=PoolMeta):
         """
         cls.update_edi_orders_state()
         return True
+
+    @classmethod
+    @ModelView.button
+    def cancel_purchase_edi(cls, purchases):
+        for purchase in purchases:
+            purchase.edi_message_function = '1'
+            purchase._create_edi_order_file()
+            purchase.edi_state = 'pending'
+            purchase.save()
 
 
 class PurchaseConfiguration(metaclass=PoolMeta):
