@@ -90,6 +90,7 @@ class Purchase(metaclass=PoolMeta):
             'readonly': Or(~Bool(Eval('use_edi')), Bool(Eval('edi_state')))
             }, depends=['use_edi', 'edi_state', 'party'])
     edi_state = fields.Selection([
+        (None, 'None'),
         ('pending', 'Pending'),
         ('sended', 'Sended'),
         ], 'EDI Communication State', states={
