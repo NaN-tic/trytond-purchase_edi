@@ -14,6 +14,19 @@ msgctxt "error:purchase.purchase:"
 msgid "Path location \"%s\" doesn't exists"
 msgstr "El directorio \"%s\" no existe"
 
+msgctxt "error:purchase.purchase:"
+msgid "Resend purchase \"%(purchase)s\"?"
+msgstr "Renviar la compra \"%(purchase)s\"?"
+
+#, fuzzy
+msgctxt "field:purchase.configuration,outbox_path_edi:"
+msgid "Outbox Path EDI"
+msgstr "Path de salida EDI"
+
+msgctxt "field:purchase.configuration,path_edi:"
+msgid "Path EDI"
+msgstr "Path EDI"
+
 msgctxt "field:purchase.purchase,edi_message_function:"
 msgid "Message Function"
 msgstr "Función del mensaje"
@@ -30,6 +43,10 @@ msgctxt "field:purchase.purchase,edi_state:"
 msgid "EDI Communication State"
 msgstr "Estado de Comunicación"
 
+msgctxt "field:purchase.purchase,resend_edi:"
+msgid "Resend Purchase"
+msgstr "Reenviar la compra"
+
 msgctxt "field:purchase.purchase,sended_on:"
 msgid "Sended On"
 msgstr "Fecha de envio"
@@ -45,6 +62,10 @@ msgstr "Utiliza EDI"
 msgctxt "help:purchase.purchase,edi_state:"
 msgid "State of the EDI communication"
 msgstr "Estado de la comunicacion EDI"
+
+msgctxt "help:purchase.purchase,resend_edi:"
+msgid "Resend again when purchase is confirmed"
+msgstr "Reenviar cuando la compra se confirme."
 
 msgctxt "help:purchase.purchase,use_edi:"
 msgid "Use EDI protocol for this purchase"
@@ -86,9 +107,19 @@ msgctxt "selection:purchase.purchase,edi_order_type:"
 msgid "Partial order that cancels an open order"
 msgstr "Pedido parcial que cancela un pedido abierto."
 
+#, fuzzy
 msgctxt "selection:purchase.purchase,edi_special_condition:"
 msgid ""
 msgstr ""
+"Hola ${record.party.name}:\n"
+"<br/>\n"
+"Le adjuntamos la factura de su <b>pedido Nº ${record.sales[0].reference if record.sales else ''}.</b>\n"
+"<br/>\n"
+"Saludos\n"
+"<br/>\n"
+"Equipo de <a href=\"http://${record.shop.website}\">${record.shop.name}</a>\n"
+"<hr/>\n"
+"<br/>\n"
 
 msgctxt "selection:purchase.purchase,edi_special_condition:"
 msgid "Bill but not re-supply"
@@ -117,6 +148,14 @@ msgstr "Pendiente"
 msgctxt "selection:purchase.purchase,edi_state:"
 msgid "Sended"
 msgstr "Enviado"
+
+msgctxt "selection:purchase.purchase,resend_edi:"
+msgid "No Resend"
+msgstr "No reenviar"
+
+msgctxt "selection:purchase.purchase,resend_edi:"
+msgid "Resend"
+msgstr "Reenviar"
 
 msgctxt "view:purchase.configuration:"
 msgid "EDI"
