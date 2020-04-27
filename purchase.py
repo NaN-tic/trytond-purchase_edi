@@ -80,6 +80,7 @@ class Purchase:
             'readonly': Or(~Bool(Eval('use_edi')), Bool(Eval('edi_state')))
             }, depends=['use_edi', 'edi_state'])
     edi_state = fields.Selection([
+        (None, 'None'),
         ('pending', 'Pending'),
         ('sended', 'Sended'),
         ], 'EDI Communication State', states={
