@@ -47,7 +47,8 @@ class Purchase:
             ], 'Document Type', states={
                 'required': Bool(Eval('use_edi')),
                 'invisible': ~Bool(Eval('use_edi')),
-                'readonly': Or(~Bool(Eval('use_edi')), Bool(Eval('edi_state')))
+                'readonly': Or(~Bool(Eval('use_edi')),
+                    Bool(Eval('state') != 'draft'))
             }, depends=['use_edi', 'edi_state'])
     edi_message_function = fields.Selection([
             ('9', 'Original'),
@@ -58,7 +59,8 @@ class Purchase:
             ], 'Message Function', states={
                 'invisible': ~Bool(Eval('use_edi')),
                 'required': Bool(Eval('use_edi')),
-                'readonly': Or(~Bool(Eval('use_edi')), Bool(Eval('edi_state')))
+                'readonly': Or(~Bool(Eval('use_edi')),
+                    Bool(Eval('state') != 'draft'))
             }, depends=['use_edi', 'edi_state'])
     edi_special_condition = fields.Selection([
             (None, ''),
@@ -67,7 +69,8 @@ class Purchase:
             ('83E', 'Deliver the entire order'),
             ], 'Special conditions, codified', states={
                 'invisible': ~Bool(Eval('use_edi')),
-                'readonly': Or(~Bool(Eval('use_edi')), Bool(Eval('edi_state')))
+                'readonly': Or(~Bool(Eval('use_edi')),
+                    Bool(Eval('state') != 'draft'))
             }, depends=['use_edi', 'edi_state'])
     supplier_edi_operational_point = fields.Many2One('party.identifier',
         'Supplier EDI Operational Point',
