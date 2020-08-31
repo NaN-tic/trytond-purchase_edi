@@ -120,7 +120,7 @@ class Purchase(metaclass=PoolMeta):
         cls._buttons.update({
             'cancel_purchase_edi': {
                 'invisible': (~Eval('state').in_(
-                    ['confirmed', 'processing', 'cancel']) |
+                    ['confirmed', 'processing', 'cancelled']) |
                         ~Bool(Eval('use_edi')))
             },
         })
