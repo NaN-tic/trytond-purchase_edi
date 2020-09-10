@@ -31,9 +31,7 @@
         </page>
     </xpath>
 
-    <xpath
-        expr="/form/notebook/page[@id='purchase']/group/group/button[@name='cancel']"
-        position="before">
+    <xpath expr="/form/group[@id='buttons']/button[@name='cancel']" position="before">
         <button name="cancel_purchase_edi" string="Cancel Edi" icon="tryton-cancel"/>
     </xpath>
 </data>
