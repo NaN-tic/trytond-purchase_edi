@@ -205,7 +205,6 @@ class Purchase(metaclass=PoolMeta):
         return cm_type, cm.value
 
     def _make_edi_order_content(self):
-
         lines = []
         customer = self.company.party
         supplier = self.party
@@ -249,7 +248,7 @@ class Purchase(metaclass=PoolMeta):
                 customer_invoice_address.street[:70],  # limit 70
                 customer_invoice_address.city[:70],  # limit 70
                 customer_invoice_address.zip[:10],  # limit 10
-                customer.vat_code[:10]  # limit 10
+                customer.tax_identifier.code[:10]  # limit 10
                 )
         lines.append(edi_nadms.replace('\n', '').replace('\r', ''))
 
@@ -262,7 +261,7 @@ class Purchase(metaclass=PoolMeta):
                 self.invoice_address.street[:70],  # limit 70
                 self.invoice_address.city[:70],  # limit 70
                 self.invoice_address.zip[:10],  # limit 10
-                supplier.vat_code[:10]  # limit 10
+                supplier.tax_identifier.code[:10]  # limit 10
                 )
         lines.append(edi_nadsu.replace('\n', '').replace('\r', ''))
 
@@ -272,7 +271,7 @@ class Purchase(metaclass=PoolMeta):
             customer_invoice_address.street[:70],  # limit 70
             customer_invoice_address.city[:70],  # limit 70
             customer_invoice_address.zip[:10],  # limit 10
-            customer.vat_code[:10]  # limit 10
+            customer.tax_identifier.code[:10]  # limit 10
             )
         lines.append(edi_nadby.replace('\n', '').replace('\r', ''))
 
@@ -310,7 +309,7 @@ class Purchase(metaclass=PoolMeta):
                 customer_invoice_address.street[:70],  # limit 70
                 customer_invoice_address.city[:70],  # limit 70
                 customer_invoice_address.zip[:70],  # limit 10
-                customer.vat_code[:10]  # limit 10
+                customer.tax_identifier.code[:10]  # limit 10
                 )
         lines.append(edi_nadiv.replace('\n', '').replace('\r', ''))
 
