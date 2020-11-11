@@ -379,11 +379,10 @@ class Purchase(metaclass=PoolMeta):
             raise UserError(gettext('path_no_exists',
                     path=path_edi))
         content = self._make_edi_order_content()
-        content = content.encode('utf-8')
         filename = 'order_{}.PLA'.format(self.number)
         with open('{}/{}'.format(path_edi, filename), 'w') as f:
             f.write(content)
-        self.add_attachment(content, filename)
+        self.add_attachment(content.encode('utf-8'), filename)
 
     def add_attachment(self, attachment, filename=None):
         pool = Pool()
