@@ -298,7 +298,7 @@ class Purchase(metaclass=PoolMeta):
         for contact_mechanism in party_cm:
             cm_type, cm_value = self.__get_edi_cm(contact_mechanism)
             if cm_type:
-                edi_comdp = 'COMDP|{0}|{1}'.format(
+                edi_comdp = 'TXT|{0}|{1}'.format(
                         cm_type,
                         cm_value[:35])  # limit 35
                 lines.append(edi_comdp.replace('\n', '').replace('\r', ''))
