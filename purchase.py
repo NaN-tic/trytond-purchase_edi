@@ -261,16 +261,16 @@ class Purchase(metaclass=PoolMeta):
             )
         lines.append(edi_naddp.replace('\n', '').replace('\r', ''))
 
-        if customer_delivery_address.name:
-            edi_ctadp = 'CTADP|OC|{}'.format(
-                customer_delivery_address.name[:35])  # limit 35
-            lines.append(edi_ctadp.replace('\n', '').replace('\r', ''))
+        edi_ctadp = 'CTADP|OC|{}'.format(
+            customer_delivery_address.name[:35]
+            if customer_delivery_address.name else '---')  # limit 35
+        lines.append(edi_ctadp.replace('\n', '').replace('\r', ''))
 
         party_cm = customer_delivery_address.party.contact_mechanisms
         for contact_mechanism in party_cm:
             cm_type, cm_value = self.__get_edi_cm(contact_mechanism)
             if cm_type:
-                edi_comdp = 'TXT|{0}|{1}'.format(
+                edi_comdp = 'COMDP|{0}|{1}'.format(
                         cm_type,
                         cm_value[:35])  # limit 35
                 lines.append(edi_comdp.replace('\n', '').replace('\r', ''))
