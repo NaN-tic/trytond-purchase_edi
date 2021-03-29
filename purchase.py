@@ -315,14 +315,10 @@ class Purchase(metaclass=PoolMeta):
                 edi_ftxlin = 'FTXLIN|{}|AAI'.format(line.note[:350])  # limit 350
                 lines.append(edi_ftxlin.replace('\n', '').replace('\r', ''))
             edi_prilin = 'PRILIN|AAA|{0}'.format(
-                format(line.unit_price, '.6f')[:18],  # limit 18
-                UOMS.get(line.unit.symbol, ''),
-                self.currency.code)
+                format(line.unit_price, '.6f')[:18])  # limit 18
             lines.append(edi_prilin.replace('\n', '').replace('\r', ''))
             edi_prilin = 'PRILIN|AAB|{0}'.format(
-                format(line.gross_unit_price, '.6f')[:18],  # limit 18
-                UOMS.get(line.unit.symbol, ''),
-                self.currency.code)
+                format(line.gross_unit_price, '.6f')[:18])  # limit 18
             lines.append(edi_prilin.replace('\n', '').replace('\r', ''))
             if line.taxes:
                 tax = line.taxes[0].rate * 100
