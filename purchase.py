@@ -247,7 +247,7 @@ class Purchase(metaclass=PoolMeta):
                 customer.name[:70],  # limit 70
                 customer_invoice_address.street[:70],  # limit 70
                 customer_invoice_address.city[:70],  # limit 70
-                customer_invoice_address.zip[:10],  # limit 10
+                customer_invoice_address.postal_code[:10],  # limit 10
                 customer.tax_identifier.code[:10]  # limit 10
                 )
         lines.append(edi_nadms.replace('\n', '').replace('\r', ''))
@@ -260,7 +260,7 @@ class Purchase(metaclass=PoolMeta):
                 supplier.name[:70],  # limit 70
                 self.invoice_address.street[:70],  # limit 70
                 self.invoice_address.city[:70],  # limit 70
-                self.invoice_address.zip[:10],  # limit 10
+                self.invoice_address.postal_code[:10],  # limit 10
                 supplier.tax_identifier.code[:10]  # limit 10
                 )
         lines.append(edi_nadsu.replace('\n', '').replace('\r', ''))
@@ -270,7 +270,7 @@ class Purchase(metaclass=PoolMeta):
             customer.name[:70],  # limit 70
             customer_invoice_address.street[:70],  # limit 70
             customer_invoice_address.city[:70],  # limit 70
-            customer_invoice_address.zip[:10],  # limit 10
+            customer_invoice_address.postal_code[:10],  # limit 10
             customer.tax_identifier.code[:10]  # limit 10
             )
         lines.append(edi_nadby.replace('\n', '').replace('\r', ''))
@@ -285,7 +285,7 @@ class Purchase(metaclass=PoolMeta):
             customer_delivery_address.party.name[:70],  # limit 70
             customer_delivery_address.street[:70],  # limit 70
             customer_delivery_address.city[:70],  # limit 70
-            customer_delivery_address.zip[:10],  # limit 10
+            customer_delivery_address.postal_code[:10],  # limit 10
             )
         lines.append(edi_naddp.replace('\n', '').replace('\r', ''))
 
@@ -308,7 +308,7 @@ class Purchase(metaclass=PoolMeta):
                 customer.name[:70],  # limit 70
                 customer_invoice_address.street[:70],  # limit 70
                 customer_invoice_address.city[:70],  # limit 70
-                customer_invoice_address.zip[:70],  # limit 10
+                customer_invoice_address.postal_code[:70],  # limit 10
                 customer.tax_identifier.code[:10]  # limit 10
                 )
         lines.append(edi_nadiv.replace('\n', '').replace('\r', ''))
