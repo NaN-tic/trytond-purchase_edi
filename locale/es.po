@@ -3,16 +3,20 @@ msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
 msgctxt "error:purchase.purchase:"
-msgid "Missing EDI EAN Warehouse code from address ID:\"%s\""
-msgstr "Falta el código EAN  EDI del almacén para la dirección ID:\"%s\""
+msgid "Missing EDI EAN Warehouse code from address ID:\"%(address)s\""
+msgstr "Falta el código EAN  EDI del almacén para la dirección ID:\"%(address)s\""
 
 msgctxt "error:purchase.purchase:"
-msgid "Missing EDI Operational Point from party \"%s\""
-msgstr "Falta el Punto Operacional EDI para el tercero \"%s\"."
+msgid "Missing EDI Operational Point from party \"%(party)s\""
+msgstr "Falta el Punto Operacional EDI para el tercero \"%(party)s\"."
 
 msgctxt "error:purchase.purchase:"
-msgid "Path location \"%s\" doesn't exists"
-msgstr "El directorio \"%s\" no existe"
+msgid "Path location \"%(path)s\" doesn't exists"
+msgstr "El directorio \"%(path)s\" no existe"
+
+msgctxt "error:purchase.purchase:"
+msgid "The product with code \"%(product)s\" hasn\'t EAN13 code"
+msgstr "El producto con código \"%(product)s\" no tiene código EAN13"
 
 msgctxt "error:purchase.purchase:"
 msgid "Resend purchase \"%(purchase)s\"?"
