@@ -12,5 +12,8 @@ this repository contains the full copyright notices and license terms. -->
         <record model="ir.message" id="path_no_exists">
             <field name="text">Path location "%(path)s" doesn\'t exists</field>
         </record>
+        <record model="ir.message" id="product_wo_ean13">
+            <field name="text">The product with code "%(product)s" hasn\'t EAN13 code</field>
+        </record>
     </data>
 </tryton>

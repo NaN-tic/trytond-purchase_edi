@@ -34,6 +34,7 @@ CM_TYPES = {
 }
 DATE_FORMAT = '%Y%m%d'
 
+
 class Cron(metaclass=PoolMeta):
     __name__ = 'ir.cron'
 
@@ -41,7 +42,8 @@ class Cron(metaclass=PoolMeta):
     def __setup__(cls):
         super(Cron, cls).__setup__()
         cls.method.selection.extend([
-            ('purchase.purchase|update_edi_orders_state_cron', 'Update EDI Orders')])
+            ('purchase.purchase|update_edi_orders_state_cron',
+                'Update EDI Orders')])
 
 
 class Purchase(metaclass=PoolMeta):
@@ -211,7 +213,8 @@ class Purchase(metaclass=PoolMeta):
             lines.append(edi_ali.replace('\n', '').replace('\r', ''))
 
         if self.comment:
-            edi_ftx = 'FTX|AAI||{}'.format(self.comment[:280])  # limit 280 chars
+            # limit 280 chars
+            edi_ftx = 'FTX|AAI||{}'.format(self.comment[:280])
             lines.append(edi_ftx.replace('\n', '').replace('\r', ''))
 
         edi_nadms = 'NADMS|{0}|{1}|{2}|{3}|{4}|{5}'.format(
@@ -290,9 +293,15 @@ class Purchase(metaclass=PoolMeta):
 
         for index, line in enumerate(self.lines):
             product = line.product
-            edi_lin = 'LIN|{0}|EN|{1}'.format(
-                product.code_ean13,
-                str(index + 1))
+            code_ean13 = None
+            for identifier in product.indetifiers:
+                if identifier.type == 'ean' and len(identifier.code) == 13:
+                    code_ean13 = identifier.code
+                    break
+            if not code_ean13:
+                raise UserError(gettext('product_wo_ean13',
+                        product=product.code))
+            edi_lin = 'LIN|{0}|EN|{1}'.format(code_ean13, str(index + 1))
             lines.append(edi_lin.replace('\n', '').replace('\r', ''))
             edi_pialin = 'PIALIN|IN|{}'.format(product.code[:35])  # limit 35
             lines.append(edi_pialin.replace('\n', '').replace('\r', ''))
@@ -312,7 +321,8 @@ class Purchase(metaclass=PoolMeta):
                     format(line.amount, '.6f')[:18])
             lines.append(edi_moalin)
             if line.note:
-                edi_ftxlin = 'FTXLIN|{}|AAI'.format(line.note[:350])  # limit 350
+                # limit 350
+                edi_ftxlin = 'FTXLIN|{}|AAI'.format(line.note[:350])
                 lines.append(edi_ftxlin.replace('\n', '').replace('\r', ''))
             edi_prilin = 'PRILIN|AAA|{0}'.format(
                 format(line.unit_price, '.6f')[:18])  # limit 18
@@ -332,7 +342,8 @@ class Purchase(metaclass=PoolMeta):
                     str(discount_value)[:18])  # limit 18
                 lines.append(edi_alclin.replace('\n', ''))
 
-        edi_moares = 'MOARES|{}\r\n'.format(str(self.total_amount)[:18])  # limit 18
+        # limit 18
+        edi_moares = 'MOARES|{}\r\n'.format(str(self.total_amount)[:18])
         lines.append(edi_moares)
 
         return unidecode('\r\n'.join(lines))
