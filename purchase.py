@@ -322,7 +322,7 @@ class Purchase(metaclass=PoolMeta):
         for index, line in enumerate(self.lines):
             product = line.product
             code_ean13 = None
-            for identifier in product.indetifiers:
+            for identifier in product.identifiers:
                 if identifier.type == 'ean' and len(identifier.code) == 13:
                     code_ean13 = identifier.code
                     break
