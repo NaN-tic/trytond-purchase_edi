@@ -184,14 +184,14 @@ class Purchase(metaclass=PoolMeta):
         supplier = self.party
         for party in (customer, supplier):
             if not party.edi_operational_point:
-                raise UserError(gettext('unfilled_edi_operational_point',
+                raise UserError(gettext('purchase_edi.unfilled_edi_operational_point',
                         party=party.rec_name))
         customer_invoice_address = self._get_party_address(customer, 'invoice')
         customer_delivery_address = self.warehouse.address if self.warehouse \
             and self.warehouse.address else \
             self._get_party_address(customer, 'delivery')
         if not customer_delivery_address.edi_ean:
-            raise UserError(gettext('unfilled_wh_edi_ean',
+            raise UserError(gettext('purchase_edi.unfilled_wh_edi_ean',
                     address=customer_delivery_address.id))
 
         header = 'ORDERS_D_96A_UN_EAN008'
@@ -299,7 +299,7 @@ class Purchase(metaclass=PoolMeta):
                     code_ean13 = identifier.code
                     break
             if not code_ean13:
-                raise UserError(gettext('product_wo_ean13',
+                raise UserError(gettext('purchase_edi.product_wo_ean13',
                         product=product.code))
             edi_lin = 'LIN|{0}|EN|{1}'.format(code_ean13, str(index + 1))
             lines.append(edi_lin.replace('\n', '').replace('\r', ''))
@@ -327,8 +327,12 @@ class Purchase(metaclass=PoolMeta):
             edi_prilin = 'PRILIN|AAA|{0}'.format(
                 format(line.unit_price, '.6f')[:18])  # limit 18
             lines.append(edi_prilin.replace('\n', '').replace('\r', ''))
-            edi_prilin = 'PRILIN|AAB|{0}'.format(
-                format(line.gross_unit_price, '.6f')[:18])  # limit 18
+            if self.get_purchase_supplier_discount_installed():
+                edi_prilin = 'PRILIN|AAB|{0}'.format(
+                    format(line.gross_unit_price, '.6f')[:18])  # limit 18
+            else:
+                edi_prilin = 'PRILIN|AAB|{0}'.format(
+                    format(line.unit_price, '.6f')[:18])  # limit 18
             lines.append(edi_prilin.replace('\n', '').replace('\r', ''))
             if line.taxes:
                 tax = line.taxes[0].rate * 100
@@ -348,6 +352,18 @@ class Purchase(metaclass=PoolMeta):
 
         return unidecode('\r\n'.join(lines))
 
+    def get_purchase_supplier_discount_installed(self):
+        pool = Pool()
+        Module = pool.get('ir.module')
+        purchase_supplier_discount = Module.search([
+              ('name', '=', 'purchase_supplier_disccount'),
+              ('state', '=', 'activated'),
+                ], limit=1)
+        print(purchase_supplier_discount)
+        if purchase_supplier_discount:
+            return True
+        return False
+
     def _create_edi_order_file(self):
         pool = Pool()
         PurchaseConfig = pool.get('purchase.configuration')
@@ -355,7 +371,7 @@ class Purchase(metaclass=PoolMeta):
         path_edi = os.path.abspath(purchase_config.outbox_path_edi or
             DEFAULT_FILES_LOCATION)
         if not os.path.isdir(path_edi):
-            raise UserError(gettext('path_no_exists',
+            raise UserError(gettext('purchase_edi.path_no_exists',
                     path=path_edi))
         content = self._make_edi_order_content()
         filename = 'order_{}.PLA'.format(self.number)
