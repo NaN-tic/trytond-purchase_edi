@@ -2,21 +2,9 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
-msgctxt "error:purchase.purchase:"
-msgid "Missing EDI EAN Warehouse code from address ID:\"%(address)s\""
-msgstr "Falta el código EAN  EDI del almacén para la dirección ID:\"%(address)s\""
-
-msgctxt "error:purchase.purchase:"
-msgid "Missing EDI Operational Point from party \"%(party)s\""
-msgstr "Falta el Punto Operacional EDI para el tercero \"%(party)s\"."
-
-msgctxt "error:purchase.purchase:"
-msgid "Path location \"%(path)s\" doesn't exists"
-msgstr "El directorio \"%(path)s\" no existe"
-
-msgctxt "error:purchase.purchase:"
-msgid "The product with code \"%(product)s\" hasn\'t EAN13 code"
-msgstr "El producto con código \"%(product)s\" no tiene código EAN13"
+msgctxt "field:purchase.configuration,outbox_path_edi:"
+msgid "Outbox Path EDI"
+msgstr "Directorio de salida EDI"
 
 msgctxt "field:purchase.purchase,edi_message_function:"
 msgid "Message Function"
@@ -54,13 +42,25 @@ msgctxt "help:purchase.purchase,use_edi:"
 msgid "Use EDI protocol for this purchase"
 msgstr "Usa el protocolo EDI para esta compra"
 
-msgctxt "model:ir.cron,name:cron_update_edi_orders_state"
-msgid "Update EDI Orders"
-msgstr "Actualizar ordenes EDI"
+msgctxt "model:ir.message,text:msg_path_no_exists"
+msgid "Path location \"%(path)s\" doesn\\'t exists"
+msgstr "El directorio \"%(path)s\" no existe"
 
-msgctxt "model:res.user,name:user_edi_orders"
-msgid "Cron EDI Orders"
-msgstr "Cron Ordenes EDI"
+msgctxt "model:ir.message,text:msg_product_wo_ean13"
+msgid "The product with code \"%(product)s\" hasn\\'t EAN13 code"
+msgstr "El producto con código \"%(product)s\" no tiene EAN13"
+
+msgctxt "model:ir.message,text:msg_unfilled_edi_operational_point"
+msgid "Missing EDI Operational Point from party \"%(party)s.\""
+msgstr "Falta el Punto Operacional EDI del tercero \"%(party)s\""
+
+msgctxt "model:ir.message,text:msg_unfilled_wh_edi_ean"
+msgid "Missing EDI EAN Warehouse code from address ID:\"%(address)s\""
+msgstr "Falta el código EDI EAN del Almacén con dirección ID: \"%(address)s\""
+
+msgctxt "selection:ir.cron,method:"
+msgid "Update EDI Orders"
+msgstr "Actualizar Compras EDI"
 
 msgctxt "selection:purchase.purchase,edi_message_function:"
 msgid "Cancellation"
@@ -89,10 +89,6 @@ msgstr "Pedido Normal"
 msgctxt "selection:purchase.purchase,edi_order_type:"
 msgid "Partial order that cancels an open order"
 msgstr "Pedido parcial que cancela un pedido abierto."
-
-msgctxt "selection:purchase.purchase,edi_special_condition:"
-msgid ""
-msgstr ""
 
 msgctxt "selection:purchase.purchase,edi_special_condition:"
 msgid "Bill but not re-supply"
