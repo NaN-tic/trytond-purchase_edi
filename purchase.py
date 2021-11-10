@@ -212,14 +212,15 @@ class Purchase(metaclass=PoolMeta):
         supplier = self.party
         for party in (customer, supplier):
             if not party.edi_operational_point:
-                raise UserError(gettext('unfilled_edi_operational_point',
+                raise UserError(gettext(
+                        'purchase_edi.msg_unfilled_edi_operational_point',
                         party=party.rec_name))
         customer_invoice_address = self._get_party_address(customer, 'invoice')
         customer_delivery_address = self.warehouse.address if self.warehouse \
             and self.warehouse.address else \
             self._get_party_address(customer, 'delivery')
         if not customer_delivery_address.edi_ean:
-            raise UserError(gettext('unfilled_wh_edi_ean',
+            raise UserError(gettext('purchase_edi.msg_unfilled_wh_edi_ean',
                     address=customer_delivery_address.id))
 
         header = 'ORDERS_D_96A_UN_EAN008'
@@ -327,7 +328,7 @@ class Purchase(metaclass=PoolMeta):
                     code_ean13 = identifier.code
                     break
             if not code_ean13:
-                raise UserError(gettext('product_wo_ean13',
+                raise UserError(gettext('purchase_edi.msg_product_wo_ean13',
                         product=product.code))
             edi_lin = 'LIN|{0}|EN|{1}'.format(code_ean13, str(index + 1))
             lines.append(edi_lin.replace('\n', '').replace('\r', ''))
@@ -383,7 +384,7 @@ class Purchase(metaclass=PoolMeta):
         path_edi = os.path.abspath(purchase_config.outbox_path_edi or
             DEFAULT_FILES_LOCATION)
         if not os.path.isdir(path_edi):
-            raise UserError(gettext('path_no_exists',
+            raise UserError(gettext('purchase_edi.msg_path_no_exists',
                     path=path_edi))
         content = self._make_edi_order_content()
         filename = 'order_{}.PLA'.format(self.number)
