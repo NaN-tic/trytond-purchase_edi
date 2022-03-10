@@ -193,8 +193,6 @@ class Purchase(metaclass=PoolMeta):
                 purchase.edi_state = 'pending'
                 purchase.save()
 
-
-
     def _get_party_address(self, party, address_type):
         for address in party.addresses:
             if hasattr(address, address_type) and getattr(
@@ -211,7 +209,7 @@ class Purchase(metaclass=PoolMeta):
         customer = self.company.party
         supplier = self.party
         for party in (customer, supplier):
-            if not party.edi_operational_point:
+            if not party.edi_operational_point_head:
                 raise UserError(gettext(
                         'purchase_edi.msg_unfilled_edi_operational_point',
                         party=party.rec_name))
@@ -247,7 +245,7 @@ class Purchase(metaclass=PoolMeta):
             lines.append(edi_ftx.replace('\n', '').replace('\r', ''))
 
         edi_nadms = 'NADMS|{0}|{1}|{2}|{3}|{4}|{5}'.format(
-                customer.edi_operational_point,
+                customer.edi_operational_point_head,
                 customer.name[:70],  # limit 70
                 customer_invoice_address.street[:70],  # limit 70
                 customer_invoice_address.city[:70],  # limit 70
@@ -270,7 +268,7 @@ class Purchase(metaclass=PoolMeta):
         lines.append(edi_nadsu.replace('\n', '').replace('\r', ''))
 
         edi_nadby = 'NADBY|{0}||||{1}|{2}|{3}|{4}|{5}'.format(
-            customer.edi_operational_point,
+            customer.edi_operational_point_head,
             customer.name[:70],  # limit 70
             customer_invoice_address.street[:70],  # limit 70
             customer_invoice_address.city[:70],  # limit 70
@@ -308,7 +306,7 @@ class Purchase(metaclass=PoolMeta):
                 lines.append(edi_comdp.replace('\n', '').replace('\r', ''))
 
         edi_nadiv = 'NADIV|{0}||{1}|{2}|{3}|{4}|{5}'.format(
-                customer.edi_operational_point,
+                customer.edi_operational_point_head,
                 customer.name[:70],  # limit 70
                 customer_invoice_address.street[:70],  # limit 70
                 customer_invoice_address.city[:70],  # limit 70
@@ -396,8 +394,8 @@ class Purchase(metaclass=PoolMeta):
         pool = Pool()
         Attachment = pool.get('ir.attachment')
         str_date = datetime.now().strftime("%y/%m/%d %H:%M:%S")
-        filename = "%(filename)s-%(date)s" % ({'filename':filename or '',
-            'date':str_date})
+        filename = "%(filename)s-%(date)s" % ({'filename': filename or '',
+            'date': str_date})
         attach = Attachment(
             name=filename,
             type='data',
